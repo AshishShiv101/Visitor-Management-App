@@ -1,5 +1,5 @@
 export default{
     PRIMARY:'#FAF9F6',
-    BUTTON:'#2E2E2E',
-    FIELD :'#808080'
+    BUTTON:'#3949AB',
+    FIELD :'#E0E0E0'
 }

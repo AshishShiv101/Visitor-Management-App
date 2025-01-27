@@ -2,6 +2,7 @@ import { View, Text,ScrollView } from 'react-native';
 import React from 'react';
 import TopCard from '../../components/Home/TopCard';
 import History from '../../components/Home/History';
+import { Redirect } from 'expo-router';
 
 export default function index() {
   return (
@@ -11,6 +12,7 @@ export default function index() {
       <Text style={styles.title}>Visitor Message</Text>
       <TopCard />
       <History />
+        <Redirect href={'login'}/> 
     </View>
     </ScrollView>
   );
