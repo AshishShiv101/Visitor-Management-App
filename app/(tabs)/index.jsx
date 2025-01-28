@@ -3,6 +3,7 @@ import React from 'react';
 import TopCard from '../../components/Home/TopCard';
 import History from '../../components/Home/History';
 import { Redirect } from 'expo-router';
+import Colors from '../../constant/Colors';
 
 export default function index() {
   return (
@@ -12,7 +13,7 @@ export default function index() {
       <Text style={styles.title}>Visitor Message</Text>
       <TopCard />
       <History />
-        <Redirect href={'login'}/> 
+        {/* <Redirect href={'login'}/>  */}
     </View>
     </ScrollView>
   );
@@ -27,9 +28,13 @@ const styles = {
   title: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#333',
+    backgroundColor: Colors.BUTTON,
+    color: '#fff',
+    borderBottomLeftRadius: 20,
+    borderBottomRightRadius: 20,
+    height:54,
     textAlign: 'center',
-    marginBottom: 20,
+    paddingTop: 7
   },
 };
 

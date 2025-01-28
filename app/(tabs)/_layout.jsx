@@ -2,6 +2,7 @@ import React from 'react';
 import { Tabs } from 'expo-router';
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
+import { LinearGradient } from 'expo-linear-gradient';
 import Colors from '../../constant/Colors';
 
 export default function _layout() {
@@ -10,32 +11,40 @@ export default function _layout() {
       screenOptions={{
         headerShown: false,
         tabBarStyle: {
-          backgroundColor: Colors.FIELD, // Background color of the tab bar
-          height: 75, // Adjusted height for a better look
-          borderTopWidth: 0, // Removed top border
-          elevation: 5, // Added shadow for better visual appeal
-          borderTopLeftRadius: 20, // Rounded top left corner
-          borderTopRightRadius: 20, // Rounded top right corner
-          overflow: 'hidden', // Ensures the rounded corners are applied
+          backgroundColor: 'transparent', // Allow the gradient background to show through
+          height: 80, // Slightly taller for a premium feel
+          borderTopWidth: 0,
+          elevation: 10, // Enhanced shadow for a floating effect
+          borderTopLeftRadius: 20,
+          borderTopRightRadius: 20,
+          overflow: 'hidden',
+          paddingBottom: 10, // Added padding for better spacing
         },
-        tabBarActiveTintColor: Colors.BUTTON, // Color for selected icons
-        tabBarInactiveTintColor: Colors.PRIMARY, // Color for unselected icons
+        tabBarActiveTintColor: '#FFFFFF', // White for selected icons for contrast
+        tabBarInactiveTintColor: '#B0BEC5', // Muted gray for unselected icons
         tabBarLabelStyle: {
-          fontSize: 12, // Font size for labels
-          fontWeight: '600', // Bold labels
-          marginBottom: 5, // Spacing below the label
+          fontSize: 13, // Slightly larger font for readability
+          fontWeight: 'bold', // Bold labels for clarity
         },
         tabBarIconStyle: {
-          marginTop:10, // Spacing above the icon
+          marginTop: 5, // Reduced margin for better alignment
         },
+        tabBarBackground: () => (
+          <LinearGradient
+            colors={['#3949AB', '#6A1B9A']} // Indigo to purple gradient for contrast
+            style={{ flex: 1 }}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+          />
+        ),
       }}
     >
       <Tabs.Screen
         name="index"
         options={{
           tabBarLabel: 'Home',
-          tabBarIcon: ({ color, size }) => (
-            <FontAwesome5 name="home" size={20} color={color} />
+          tabBarIcon: ({ color }) => (
+            <FontAwesome5 name="home" size={24} color={color} />
           ),
         }}
       />
@@ -43,8 +52,8 @@ export default function _layout() {
         name="Profile"
         options={{
           tabBarLabel: 'Profile',
-          tabBarIcon: ({ color, size }) => (
-            <FontAwesome name="user" size={20} color={color} />
+          tabBarIcon: ({ color }) => (
+            <FontAwesome name="user" size={24} color={color} />
           ),
         }}
       />
