@@ -2,6 +2,7 @@ import React, { useRef, useState } from 'react';
 import { View, Text, StyleSheet, Dimensions, Animated, TouchableOpacity } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Colors from '../../constant/Colors';
+import { router, useRouter } from 'expo-router';
 
 const { width } = Dimensions.get('window');
 const CARD_WIDTH = width * 0.8;
@@ -17,6 +18,7 @@ const visitors = [
 ];
 
 export default function History() {
+    const router = useRouter();
     const scrollX = useRef(new Animated.Value(0)).current;
     const flatListRef = useRef(null);
     const [activeIndex, setActiveIndex] = useState(0);
@@ -45,11 +47,6 @@ export default function History() {
         offset: (CARD_WIDTH + SPACING * 2) * index,
         index,
     });
-
-    const handleViewMore = () => {
-        console.log('View More pressed');
-        // Add your navigation or additional functionality here
-    };
 
     return (
         <View style={[styles.container, { paddingTop: insets.top }]}>
@@ -136,8 +133,8 @@ export default function History() {
 
             <TouchableOpacity
                 style={styles.viewMoreButton}
-                onPress={handleViewMore}
                 activeOpacity={0.7}
+                onPress={() => router.push("History/HistoryListView")}
             >
                 <Text style={styles.viewMoreText}>View More</Text>
             </TouchableOpacity>
