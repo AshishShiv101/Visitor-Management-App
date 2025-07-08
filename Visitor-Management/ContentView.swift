@@ -8,17 +8,28 @@
 import SwiftUI
 
 struct ContentView: View {
+    @State private var showSplash = true
+    
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
+        ZStack {
+            if showSplash {
+                SplashScreen()
+                    .transition(.opacity)
+            } else {
+                LoginPage()
+                    .transition(.opacity)
+            }
         }
-        .padding()
+        .onAppear {
+            // Show splash screen for 3 seconds, then transition to login
+            DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
+                withAnimation(.easeInOut(duration: 0.8)) {
+                    showSplash = false
+                }
+            }
+        }
     }
 }
-
 #Preview {
     ContentView()
 }

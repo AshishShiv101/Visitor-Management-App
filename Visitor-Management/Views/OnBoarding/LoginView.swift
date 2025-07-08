@@ -3,14 +3,11 @@ import SwiftUI
 struct LoginPage: View {
     @State private var phoneNumber: String = ""
     @State private var isPasswordVisible: Bool = false
-    @State private var containerOffset: CGFloat = 50
-    @State private var topCircleScale: CGFloat = 0.5
-    @State private var bottomCircleScale: CGFloat = 0.3
-    @State private var topCircleOpacity: Double = 0.1
-    @State private var bottomCircleOpacity: Double = 0.2
-    @FocusState private var focusedField: Field?
-    @Environment(\.colorScheme) var colorScheme
     @State private var particles: [Particle] = []
+    @State private var showContent = false
+    @State private var headerOffset: CGFloat = -50
+    @State private var formOffset: CGFloat = 50
+    @FocusState private var focusedField: Field?
     
     enum Field: Hashable {
         case phoneNumber
@@ -18,230 +15,199 @@ struct LoginPage: View {
     
     var body: some View {
         ZStack {
-            // Black background
+            // Pure black background
             Color.black
                 .ignoresSafeArea()
             
-            // Particle effect
+            // Floating white particles
             ForEach(particles) { particle in
                 Circle()
-                    .fill(Color.white.opacity(0.3))
+                    .fill(Color.white.opacity(0.6))
                     .frame(width: particle.size, height: particle.size)
                     .position(x: particle.x, y: particle.y)
-                    .opacity(1.0)
+                    .opacity(showContent ? 1.0 : 0.0)
                     .animation(
                         .easeInOut(duration: particle.duration)
+                        .delay(particle.delay)
                         .repeatForever(autoreverses: true),
-                        value: 1.0
+                        value: showContent
                     )
             }
             
-            // Main content
-            VStack(spacing: 20) {
-                // Header
-                VStack(spacing: 5) {
-                    HStack {
-                        Image(systemName: "dumbbell.fill")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 30, height: 30)
-                            .foregroundColor(.white)
-                            .rotationEffect(.degrees(90))
-                        Rectangle()
-                            .frame(width: 2, height: 30)
-                            .foregroundColor(.white)
-                        Text("ShapeShift")
-                            .font(.title)
-                            .fontWeight(.semibold)
-                            .foregroundColor(.white)
-                            .shadow(color: Color.black.opacity(0.3), radius: 2, x: 0, y: 1)
-                    }
-                    Text("Transform Your Fitness Journey")
-                        .font(.caption)
-                        .foregroundColor(.white.opacity(0.8))
-                }
-                .padding(.top, 40)
-                
-                // Sign in text
-                Text("Sign in to your Account")
-                    .font(.title)
-                    .fontWeight(.bold)
-                    .foregroundColor(.white)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.leading, 20)
-                    .shadow(color: Color.black.opacity(0.3), radius: 2, x: 0, y: 1)
-                
-                Text("Enter your phone number to log in")
-                    .font(.subheadline)
-                    .foregroundColor(.white.opacity(0.8))
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.leading, 20)
-                    .padding(.bottom, 20)
-                
-                // Glassmorphic container for form
-                ZStack {
-                    // Glassmorphic background
-                    RoundedRectangle(cornerRadius: 24)
-                        .foregroundColor(Color.gray.opacity(0.2))
-                        .frame(height: 200)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 24)
-                                .stroke(
-                                    LinearGradient(
-                                        gradient: Gradient(colors: [
-                                            Color.white.opacity(0.6),
-                                            Color.white.opacity(0.2)
-                                        ]),
-                                        startPoint: .topLeading,
-                                        endPoint: .bottomTrailing
-                                    ),
-                                    lineWidth: 1.5
-                                )
+            ScrollView {
+                VStack(spacing: 40) {
+                    // Header section
+                    VStack(spacing: 25) {
+                        // Logo and branding using LogoWithTextView
+                        LogoWithTextView(
+                            logoSize: 50,
+                            iconSize: 20,
+                            titleFont: .title2,
+                            subtitleFont: .caption,
+                            spacing: 15,
+                            alignment: .leading
                         )
-                        .shadow(color: Color.black.opacity(0.1), radius: 20, x: 0, y: 10)
-                    
-                    RoundedRectangle(cornerRadius: 24)
-                        .foregroundColor(Color.gray.opacity(0.05))
-                        .padding(3)
-                        .blur(radius: 8)
-                    
-                    // Form content
-                    VStack(spacing: 15) {
-                        // Phone number field
-                        ModernTextField(
-                            title: "Phone Number",
-                            text: $phoneNumber,
-                            isTyping: focusedField == .phoneNumber,
-                            keyboardType: .phonePad,
-                            autocapitalization: .never
-                        )
-                        .focused($focusedField, equals: .phoneNumber)
                         .padding(.horizontal, 20)
-                        .padding(.top, 30)
+                        .offset(y: headerOffset)
+                        .opacity(showContent ? 1.0 : 0.0)
                         
-                        // Log in Button
+                        // Welcome text
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("Welcome Back")
+                                .font(.largeTitle)
+                                .fontWeight(.bold)
+                                .foregroundColor(.white)
+                            
+                            Text("Sign in to access your vehicle dashboard")
+                                .font(.subheadline)
+                                .foregroundColor(.white.opacity(0.7))
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.horizontal, 20)
+                        .offset(y: headerOffset)
+                        .opacity(showContent ? 1.0 : 0.0)
+                    }
+                    .padding(.top, 60)
+                    
+                    // Form section
+                    VStack(spacing: 30) {
+                        // Phone number input
+                        VStack(alignment: .leading, spacing: 10) {
+                            Text("Phone Number")
+                                .font(.subheadline)
+                                .fontWeight(.medium)
+                                .foregroundColor(.white)
+                            
+                            ZStack {
+                                // Input field background
+                                RoundedRectangle(cornerRadius: 12)
+                                    .fill(Color.white.opacity(0.1))
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 12)
+                                            .stroke(
+                                                focusedField == .phoneNumber ? Color.white.opacity(0.8) : Color.white.opacity(0.3),
+                                                lineWidth: focusedField == .phoneNumber ? 2 : 1
+                                            )
+                                    )
+                                    .animation(.easeInOut(duration: 0.2), value: focusedField)
+                                
+                                HStack {
+                                    Image(systemName: "phone.fill")
+                                        .foregroundColor(.white.opacity(0.7))
+                                        .font(.system(size: 16))
+                                    
+                                    TextField("Enter your phone number", text: $phoneNumber)
+                                        .textFieldStyle(PlainTextFieldStyle())
+                                        .foregroundColor(.white)
+                                        .keyboardType(.phonePad)
+                                        .focused($focusedField, equals: .phoneNumber)
+                                        .placeholder(when: phoneNumber.isEmpty) {
+                                            Text("Enter your phone number")
+                                                .foregroundColor(.white.opacity(0.5))
+                                        }
+                                }
+                                .padding(.horizontal, 16)
+                                .padding(.vertical, 16)
+                            }
+                            .frame(height: 56)
+                        }
+                        
+                        // Login button
                         ModernButton(
-                            title: "Log in",
+                            title: "Sign In",
                             isEnabled: !phoneNumber.isEmpty,
                             action: {
-                                print("Login tapped")
+                                print("Login tapped with phone: \(phoneNumber)")
                             }
                         )
-                        .padding(.horizontal, 20)
-                        .padding(.top, 10)
+                        
+                        // Additional options
+                
                     }
+                    .padding(.horizontal, 20)
+                    .offset(y: formOffset)
+                    .opacity(showContent ? 1.0 : 0.0)
+                    
+                    Spacer(minLength: 50)
                 }
             }
         }
         .onAppear {
-            // Initialize particles
-            for _ in 0..<20 {
-                let particle = Particle(
-                    x: CGFloat.random(in: 0...UIScreen.main.bounds.width),
-                    y: CGFloat.random(in: 0...UIScreen.main.bounds.height),
-                    size: CGFloat.random(in: 5...15),
-                    duration: Double.random(in: 2...5)
-                )
-                particles.append(particle)
-            }
+            initializeParticles()
+            startAnimations()
+        }
+        .onTapGesture {
+            focusedField = nil
         }
     }
-}
-
-// Modern TextField Component
-struct ModernTextField: View {
-    let title: String
-    @Binding var text: String
-    var isTyping: Bool
-    var keyboardType: UIKeyboardType = .default
-    var autocapitalization: TextInputAutocapitalization = .sentences
-    @State private var isValid: Bool = true
-    @FocusState private var isFocused: Bool
     
-    var body: some View {
-        ZStack(alignment: .leading) {
-            TextField("", text: $text)
-                .padding(.leading, 16)
-                .frame(height: 55)
-                .background(
-                    RoundedRectangle(cornerRadius: 12)
-                        .stroke(
-                            isFocused ? Color.white : Color.white.opacity(0.3),
-                            lineWidth: isFocused ? 2 : 1.5
-                        )
-                        .background(
-                            RoundedRectangle(cornerRadius: 12)
-                                .fill(Color.white.opacity(0.95))
-                        )
-                )
-                .textFieldStyle(PlainTextFieldStyle())
-                .focused($isFocused)
-                .keyboardType(keyboardType)
-                .textInputAutocapitalization(autocapitalization)
-                .foregroundColor(.black)
-                .shadow(color: Color.black.opacity(0.1), radius: 8, x: 0, y: 4)
-            
-            Text(title)
-                .padding(.horizontal, 8)
-                .background(Color.white)
-                .foregroundColor(isFocused ? Color.white : .gray)
-                .font(.system(size: isFocused || !text.isEmpty ? 12 : 16, weight: isFocused ? .medium : .regular))
-                .padding(.leading, 12)
-                .offset(y: isFocused || !text.isEmpty ? -27 : 0)
-                .onTapGesture {
-                    isFocused = true
-                }
+    private func initializeParticles() {
+        particles = []
+        for i in 0..<15 {
+            let particle = Particle(
+                x: CGFloat.random(in: 0...UIScreen.main.bounds.width),
+                y: CGFloat.random(in: 0...UIScreen.main.bounds.height),
+                size: CGFloat.random(in: 3...6),
+                duration: Double.random(in: 4...8),
+                delay: Double(i) * 0.2
+            )
+            particles.append(particle)
         }
-        .animation(.easeInOut(duration: 0.2), value: isFocused)
-        .onChange(of: isTyping) { newValue in
-            isFocused = newValue
+    }
+    
+    private func startAnimations() {
+        withAnimation(.easeInOut(duration: 0.8)) {
+            showContent = true
+            headerOffset = 0
+        }
+        
+        withAnimation(.easeInOut(duration: 0.8).delay(0.3)) {
+            formOffset = 0
         }
     }
 }
 
-// Modern Button Component
+// MARK: - Modern Button Component (Black & White)
 struct ModernButton: View {
     let title: String
     let isEnabled: Bool
     let action: () -> Void
     @State private var isPressed = false
-    @State private var shimmerOffset: CGFloat = -0.25
+    @State private var shimmerOffset: CGFloat = -1.0
     
     var body: some View {
         Button(action: action) {
             ZStack {
-                // Base gradient
+                // Base button
                 RoundedRectangle(cornerRadius: 12)
-                    .fill(
-                        LinearGradient(
-                            gradient: Gradient(colors: [
-                                isEnabled ? Color.purple : Color.gray.opacity(0.6),
-                                isEnabled ? Color.blue : Color.gray.opacity(0.4)
-                            ]),
-                            startPoint: .leading,
-                            endPoint: .trailing
-                        )
+                    .fill(isEnabled ? Color.white : Color.white.opacity(0.3))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 12)
+                            .stroke(Color.white.opacity(0.5), lineWidth: 1)
                     )
                 
-                // Shimmer effect
+                // Shimmer effect for enabled state
                 if isEnabled {
                     RoundedRectangle(cornerRadius: 12)
                         .fill(
                             LinearGradient(
                                 gradient: Gradient(colors: [
                                     Color.white.opacity(0.0),
-                                    Color.white.opacity(0.1),
-                                    Color.white.opacity(0.2),
-                                    Color.white.opacity(0.1),
+                                    Color.white.opacity(0.3),
+                                    Color.white.opacity(0.6),
+                                    Color.white.opacity(0.3),
                                     Color.white.opacity(0.0)
                                 ]),
                                 startPoint: UnitPoint(x: shimmerOffset, y: shimmerOffset),
-                                endPoint: UnitPoint(x: shimmerOffset + 1, y: shimmerOffset + 1)
+                                endPoint: UnitPoint(x: shimmerOffset + 0.5, y: shimmerOffset + 0.5)
                             )
                         )
                         .onAppear {
-                            withAnimation(Animation.easeInOut(duration: 2.0).repeatForever(autoreverses: false)) {
-                                shimmerOffset = 1.25
+                            withAnimation(
+                                Animation.linear(duration: 2.0)
+                                    .repeatForever(autoreverses: false)
+                            ) {
+                                shimmerOffset = 1.0
                             }
                         }
                 }
@@ -249,23 +215,44 @@ struct ModernButton: View {
                 Text(title)
                     .font(.headline)
                     .fontWeight(.semibold)
-                    .foregroundColor(.white)
+                    .foregroundColor(isEnabled ? .black : .white.opacity(0.5))
             }
             .frame(maxWidth: .infinity)
             .frame(height: 56)
             .scaleEffect(isPressed ? 0.95 : 1.0)
-            .shadow(color: Color.black.opacity(0.1), radius: 8, x: 0, y: 4)
+            .animation(.spring(response: 0.3, dampingFraction: 0.6), value: isPressed)
         }
         .disabled(!isEnabled)
-        .opacity(isEnabled ? 1.0 : 0.7)
-        .onLongPressGesture(minimumDuration: 0, maximumDistance: .infinity, pressing: { pressing in
-            withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
-                isPressed = pressing
-            }
-        }, perform: {})
+        .simultaneousGesture(
+            DragGesture(minimumDistance: 0)
+                .onChanged { _ in
+                    if !isPressed {
+                        isPressed = true
+                    }
+                }
+                .onEnded { _ in
+                    isPressed = false
+                    if isEnabled {
+                        action()
+                    }
+                }
+        )
     }
 }
 
+// MARK: - Placeholder Extension
+extension View {
+    func placeholder<Content: View>(
+        when shouldShow: Bool,
+        alignment: Alignment = .leading,
+        @ViewBuilder placeholder: () -> Content) -> some View {
+        
+        ZStack(alignment: alignment) {
+            placeholder().opacity(shouldShow ? 1 : 0)
+            self
+        }
+    }
+}
 
 #Preview {
     LoginPage()
