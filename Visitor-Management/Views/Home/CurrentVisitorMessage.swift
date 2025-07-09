@@ -1,12 +1,20 @@
 import SwiftUI
 
 struct CurrentVisitorMessage: View {
-    // Sample data for visitors
-    let visitors = [
-        Visitor(name: "John Doe", time: "10:30 AM", message: "Here for a meeting"),
-        Visitor(name: "Jane Smith", time: "11:15 AM", message: "Delivery package"),
-        Visitor(name: "Alex Brown", time: "12:00 PM", message: "Service appointment")
+    // Sample data for visitors with random meeting times
+    @State private var visitors: [Visitor] = [
+        Visitor(name: "John Doe", time: "10:30 AM", message: "Here for a meeting with the marketing team", meetingTime: randomMeetingTime()),
+        Visitor(name: "Jane Smith", time: "11:15 AM", message: "Delivery package for HR department", meetingTime: randomMeetingTime()),
+        Visitor(name: "Alex Brown", time: "12:00 PM", message: "Service appointment for AC maintenance", meetingTime: randomMeetingTime()),
+        Visitor(name: "Emily Davis", time: "1:00 PM", message: "Client visit to discuss sales report", meetingTime: randomMeetingTime()),
+        Visitor(name: "Michael Lee", time: "2:30 PM", message: "Consultation about software implementation", meetingTime: randomMeetingTime())
     ]
+    
+    // Function to generate random meeting times
+    static func randomMeetingTime() -> String {
+        let hours = [15, 30, 45, 60, 90, 120].randomElement()!
+        return "\(hours) min"
+    }
     
     var body: some View {
         VStack(alignment: .leading, spacing: 15) {
@@ -14,63 +22,128 @@ struct CurrentVisitorMessage: View {
                 .font(.title2)
                 .fontWeight(.bold)
                 .foregroundColor(.white)
+                .padding(.horizontal, 20)
             
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 15) {
-                    ForEach(visitors) { visitor in
-                        VisitorCard(visitor: visitor)
+                    ForEach(0..<visitors.count, id: \.self) { index in
+                        VisitorCard(visitor: Binding(
+                            get: { self.visitors[index] },
+                            set: { self.visitors[index] = $0 }
+                        ))
+                        .frame(width: 280, height: 220)
                     }
                 }
+                
                 .padding(.vertical, 10)
             }
         }
     }
 }
 
-// Visitor data model
+// Visitor data model with new meetingTime field
 struct Visitor: Identifiable {
     let id = UUID()
     let name: String
     let time: String
     let message: String
+    let meetingTime: String
 }
 
 // Visitor card component
 struct VisitorCard: View {
-    let visitor: Visitor
+    @Binding var visitor: Visitor
     @State private var isPressed = false
     
     var body: some View {
         ZStack {
-            RoundedRectangle(cornerRadius: 12)
+            RoundedRectangle(cornerRadius: 16)
                 .fill(Color.white.opacity(0.1))
                 .overlay(
-                    RoundedRectangle(cornerRadius: 12)
+                    RoundedRectangle(cornerRadius: 16)
                         .stroke(Color.white.opacity(0.5), lineWidth: 1)
                 )
             
-            VStack(alignment: .leading, spacing: 10) {
+            VStack(alignment: .leading, spacing: 12) {
                 HStack {
                     Image(systemName: "person.fill")
                         .foregroundColor(.white.opacity(0.7))
-                        .font(.system(size: 16))
+                        .font(.system(size: 18))
                     
                     Text(visitor.name)
                         .font(.headline)
                         .foregroundColor(.white)
+                    
+                    Spacer()
+                    
+                    Text(visitor.time)
+                        .font(.subheadline)
+                        .foregroundColor(.white.opacity(0.7))
                 }
                 
-                Text(visitor.time)
-                    .font(.subheadline)
-                    .foregroundColor(.white.opacity(0.7))
-                
                 Text(visitor.message)
-                    .font(.caption)
+                    .font(.body)
                     .foregroundColor(.white.opacity(0.9))
                     .lineLimit(2)
+                    .padding(.vertical, 4)
+                
+                // New meeting time field
+                HStack {
+                    Image(systemName: "clock")
+                        .foregroundColor(.white.opacity(0.7))
+                        .font(.system(size: 14))
+                    
+                    Text("Meeting Time: \(visitor.meetingTime)")
+                        .font(.subheadline)
+                        .foregroundColor(.white.opacity(0.8))
+                }
+                .padding(.vertical, 4)
+                
+                Spacer()
+                
+                // Action buttons
+                HStack(spacing: 10) {
+                    Button(action: {
+                        // Accept action
+                    }) {
+                        Text("Accept")
+                            .font(.subheadline)
+                            .fontWeight(.medium)
+                            .foregroundColor(.white)
+                            .padding(.vertical, 8)
+                            .frame(maxWidth: .infinity)
+                            .background(Color.green)
+                            .cornerRadius(8)
+                    }
+                    
+                    Button(action: {
+                        // Reject action
+                    }) {
+                        Text("Reject")
+                            .font(.subheadline)
+                            .fontWeight(.medium)
+                            .foregroundColor(.white)
+                            .padding(.vertical, 8)
+                            .frame(maxWidth: .infinity)
+                            .background(Color.red)
+                            .cornerRadius(8)
+                    }
+                    
+                    Button(action: {
+                        // Stall action
+                    }) {
+                        Text("Stall")
+                            .font(.subheadline)
+                            .fontWeight(.medium)
+                            .foregroundColor(.white)
+                            .padding(.vertical, 8)
+                            .frame(maxWidth: .infinity)
+                            .background(Color.gray)
+                            .cornerRadius(8)
+                    }
+                }
             }
-            .padding(16)
-            .frame(width: 200, alignment: .leading)
+            .padding(20)
         }
         .scaleEffect(isPressed ? 0.95 : 1.0)
         .animation(.spring(response: 0.3, dampingFraction: 0.6), value: isPressed)

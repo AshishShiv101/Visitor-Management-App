@@ -1,7 +1,8 @@
 import SwiftUI
 
+
 struct LoginPage: View {
-    @State private var phoneNumber: String = ""
+    @State private var phoneNumber: String = "0123456789" // Default phone number
     @State private var isPasswordVisible: Bool = false
     @State private var particles: [Particle] = []
     @State private var showContent = false
@@ -12,6 +13,8 @@ struct LoginPage: View {
     enum Field: Hashable {
         case phoneNumber
     }
+    
+    var onLogin: (String) -> Void // Closure to pass phone number to ContentView
     
     var body: some View {
         ZStack {
@@ -94,7 +97,7 @@ struct LoginPage: View {
                                 HStack {
                                     Image(systemName: "phone.fill")
                                         .foregroundColor(.white.opacity(0.7))
-                                        .font(.system(size: 16))
+                                        .font(.system(size:16))
                                     
                                     TextField("Enter your phone number", text: $phoneNumber)
                                         .textFieldStyle(PlainTextFieldStyle())
@@ -114,15 +117,15 @@ struct LoginPage: View {
                         
                         // Login button
                         ModernButton(
-                            title: "Sign In",
+                            title: "Send OTP",
                             isEnabled: !phoneNumber.isEmpty,
                             action: {
-                                print("Login tapped with phone: \(phoneNumber)")
+                                onLogin(phoneNumber) // Pass phone number to closure
                             }
                         )
                         
-                        // Additional options
-                
+                        // Additional
+
                     }
                     .padding(.horizontal, 20)
                     .offset(y: formOffset)
@@ -240,6 +243,7 @@ struct ModernButton: View {
     }
 }
 
+
 // MARK: - Placeholder Extension
 extension View {
     func placeholder<Content: View>(
@@ -255,5 +259,5 @@ extension View {
 }
 
 #Preview {
-    LoginPage()
+    LoginPage(onLogin: { _ in })
 }

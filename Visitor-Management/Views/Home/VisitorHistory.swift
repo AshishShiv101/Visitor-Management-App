@@ -3,21 +3,43 @@ import SwiftUI
 struct VisitorHistory: View {
     // Sample data for visitor history
     let history = [
-        VisitorHistoryItem(name: "Sarah Wilson", date: "07/07/2025", time: "09:00 AM"),
-        VisitorHistoryItem(name: "Mike Johnson", date: "07/06/2025", time: "02:30 PM"),
-        VisitorHistoryItem(name: "Emily Davis", date: "07/05/2025", time: "11:45 AM"),
-        VisitorHistoryItem(name: "Chris Lee", date: "07/04/2025", time: "04:15 PM")
+        VisitorHistoryItem(name: "Sarah Wilson", date: "07/07/2025", time: "09:00 AM", description: "Business meeting"),
+        VisitorHistoryItem(name: "Mike Johnson", date: "07/06/2025", time: "02:30 PM", description: "Project consultation"),
+        VisitorHistoryItem(name: "Emily Davis", date: "07/05/2025", time: "11:45 AM", description: "Guest speaker"),
+        VisitorHistoryItem(name: "Chris Lee", date: "07/04/2025", time: "04:15 PM", description: "Client visit")
     ]
     
+    @State private var selectedVisitor: VisitorHistoryItem?
+    
     var body: some View {
-        VStack(alignment: .leading, spacing: 15) {
-            Text("Visitor History")
-                .font(.title2)
-                .fontWeight(.bold)
-                .foregroundColor(.white)
+        ZStack {
+            VStack(alignment: .leading, spacing: 15) {
+                Text("Visitor History")
+                    .font(.title2)
+                    .fontWeight(.bold)
+                    .foregroundColor(.white)
+                
+                ForEach(history) { item in
+                    HistoryRow(item: item)
+                        .onTapGesture {
+                            selectedVisitor = item
+                        }
+                }
+            }
             
-            ForEach(history) { item in
-                HistoryRow(item: item)
+            // Overlay card
+            if let visitor = selectedVisitor {
+                Color.black.opacity(0.5)
+                    .edgesIgnoringSafeArea(.all)
+                    .onTapGesture {
+                        selectedVisitor = nil
+                    }
+                
+                VisitorCardView(visitor: visitor) {
+                    selectedVisitor = nil
+                }
+                .transition(.scale)
+                .zIndex(1)
             }
         }
     }
@@ -29,6 +51,7 @@ struct VisitorHistoryItem: Identifiable {
     let name: String
     let date: String
     let time: String
+    let description: String
 }
 
 // History row component
@@ -66,7 +89,6 @@ struct HistoryRow: View {
         }
     }
 }
-
 #Preview {
     VisitorHistory()
         .padding()
