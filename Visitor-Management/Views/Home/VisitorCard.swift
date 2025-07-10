@@ -67,12 +67,28 @@ struct VisitorCardView: View {
                             .font(.subheadline)
                             .foregroundColor(.white)
                     }
+                    
+                    // Status
+                    HStack {
+                        Image(systemName: "tag")
+                            .foregroundColor(.white.opacity(0.7))
+                        Text("Status: \(visitor.status.rawValue)")
+                            .font(.subheadline)
+                            .fontWeight(.medium)
+                            .foregroundColor(visitor.status.color)
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 4)
+                            .background(
+                                RoundedRectangle(cornerRadius: 6)
+                                    .fill(visitor.status.color.opacity(0.15))
+                            )
+                    }
                 }
             }
             .padding(25)
             .frame(width: 300)
-            .frame(height: 300)
+            .frame(height: 340) // Increased height to accommodate status
         }
-        .frame(width: 320,height: 100)
+        .frame(width: 320, height: 360) // Adjusted outer frame
     }
 }

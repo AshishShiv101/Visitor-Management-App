@@ -10,6 +10,13 @@ struct CurrentVisitorMessage: View {
         Visitor(name: "Michael Lee", time: "2:30 PM", message: "Consultation about software implementation", meetingTime: randomMeetingTime())
     ]
     
+    @State private var currentIndex = 0
+    @State private var dragOffset: CGFloat = 0
+    @State private var isDragging = false
+    
+    private let cardWidth: CGFloat = 280
+    private let cardSpacing: CGFloat = 15
+    
     // Function to generate random meeting times
     static func randomMeetingTime() -> String {
         let hours = [15, 30, 45, 60, 90, 120].randomElement()!
@@ -22,26 +29,62 @@ struct CurrentVisitorMessage: View {
                 .font(.title2)
                 .fontWeight(.bold)
                 .foregroundColor(.white)
-                .padding(.horizontal, 20)
             
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 15) {
+            // Carousel container
+            GeometryReader { geometry in
+                let totalOffset = -CGFloat(currentIndex) * (cardWidth + cardSpacing) + dragOffset
+                
+                HStack(spacing: cardSpacing) {
                     ForEach(0..<visitors.count, id: \.self) { index in
                         VisitorCard(visitor: Binding(
                             get: { self.visitors[index] },
                             set: { self.visitors[index] = $0 }
                         ))
-                        .frame(width: 280, height: 220)
+                        .frame(width: cardWidth, height: 220)
                     }
                 }
-                
-                .padding(.vertical, 10)
+                .offset(x: totalOffset)
+                .animation(.easeInOut(duration: isDragging ? 0 : 0.5), value: currentIndex)
+                .animation(.easeInOut(duration: 0.3), value: dragOffset)
+                .gesture(
+                    DragGesture()
+                        .onChanged { gesture in
+                            isDragging = true
+                            dragOffset = gesture.translation.width
+                        }
+                        .onEnded { gesture in
+                            isDragging = false
+                            let threshold: CGFloat = 50
+                            
+                            if gesture.translation.width > threshold && currentIndex > 0 {
+                                currentIndex -= 1
+                            } else if gesture.translation.width < -threshold && currentIndex < visitors.count - 1 {
+                                currentIndex += 1
+                            }
+                            
+                            dragOffset = 0
+                        }
+                )
             }
+            .frame(height: 240)
+            
+            // Page indicators
+            HStack(spacing: 8) {
+                ForEach(0..<visitors.count, id: \.self) { index in
+                    Circle()
+                        .fill(index == currentIndex ? Color.white : Color.white.opacity(0.4))
+                        .frame(width: 8, height: 8)
+                        .scaleEffect(index == currentIndex ? 1.2 : 1.0)
+                        .animation(.easeInOut(duration: 0.3), value: currentIndex)
+                }
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.top, 10)
         }
     }
 }
 
-// Visitor data model with new meetingTime field
+// Visitor data model
 struct Visitor: Identifiable {
     let id = UUID()
     let name: String
@@ -87,7 +130,7 @@ struct VisitorCard: View {
                     .lineLimit(2)
                     .padding(.vertical, 4)
                 
-                // New meeting time field
+                // Meeting time field
                 HStack {
                     Image(systemName: "clock")
                         .foregroundColor(.white.opacity(0.7))
